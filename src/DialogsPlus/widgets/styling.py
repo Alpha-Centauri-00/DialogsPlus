@@ -14,9 +14,14 @@ class InputDialog(BaseDialog):
         self.is_error = is_error
     
     def build_ui(self, app):
-        entry = ctk.CTkEntry(app, width=self.config.entry_width, 
-                            height=self.config.entry_height)
+        frame = ctk.CTkFrame(app, fg_color="transparent")
+        frame.pack(pady=8)
+
+        label = self.create_label(frame, text=self.prompt)
+        label.pack() 
+        entry = self.create_entry(frame)
         entry.insert(0, self.default)
+        entry.pack()
         
         def on_submit():
             self.result['value'] = entry.get()
@@ -26,9 +31,6 @@ class InputDialog(BaseDialog):
         app.bind('<Return>', lambda e: on_submit())
         app.bind('<Escape>', lambda e: app.quit())
         
-        ctk.CTkLabel(app, text=self.prompt, 
-                    font=self.config.label_font).pack(pady=(20, 10))
-        entry.pack(pady=(0, 20))
         entry.focus_set()
         
         self.create_button(app, text="Submit", command=on_submit).pack()
@@ -52,8 +54,7 @@ class ManualStepDialog(BaseDialog):
         app.protocol("WM_DELETE_WINDOW", app.quit)
         app.bind('<Escape>', lambda e: app.quit())
 
-        ctk.CTkLabel(app, text=self.message, 
-                    font=self.config.label_font).pack(pady=(self.config.spacing, 10))
+        self.create_label(app, text=self.message).pack(pady=25)
 
         button_frame = ctk.CTkFrame(app,fg_color="transparent")
         button_frame.pack(pady=(10, self.config.spacing), expand=True)
@@ -78,7 +79,7 @@ class CountdownDialog(BaseDialog):
     
     def build_ui(self, app):
         
-        label = ctk.CTkLabel(app, text="", font=("Courier New", 32))
+        label = self.create_label(app, text="")
         label.place(relx=0.5, rely=0.4, anchor="center")
 
         progress = ctk.CTkProgressBar(app, width=300, height=12, progress_color="#00c0b5")
@@ -174,8 +175,7 @@ class ConfirmationDialog(BaseDialog):
         app.protocol("WM_DELETE_WINDOW", app.quit)
         app.bind('<Escape>', lambda e: app.quit())
 
-        ctk.CTkLabel(app, text=self.message, 
-                    font=self.config.label_font).pack(pady=(self.config.spacing, 10))
+        self.create_label(app, text=self.message).pack(pady=25)
 
         button_frame = ctk.CTkFrame(app,fg_color="transparent")
         button_frame.pack(pady=(10, self.config.spacing), expand=True)
@@ -183,17 +183,17 @@ class ConfirmationDialog(BaseDialog):
         self.create_button(
             button_frame,
             text="Yes",
-            command=on_yes).pack(side="left", padx=10)
+            command=on_yes).pack(side="left", padx=5)
 
         self.create_button(
             button_frame,
             text="No",
-            command=on_no).pack(side="left", padx=10)
+            command=on_no).pack(side="left", padx=5)
 
         self.create_button(
             button_frame,
             text="Cancel",
-            command=on_cancel).pack(side="left", padx=10)
+            command=on_cancel).pack(side="left", padx=5)
         
 
 class GetConfirmationFromUser:
@@ -239,8 +239,8 @@ class MultiValueInputDialog(BaseDialog):
         main_frame = ctk.CTkFrame(app, fg_color="transparent")
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        title = ctk.CTkLabel(main_frame, text="Enter values", font=("Courier New", 18))
-        title.pack(pady=(0, 15))
+        title = self.create_label(main_frame, text="Enter values")
+        title.pack(pady=25)
 
         fields_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
         fields_frame.pack(fill="both", expand=True)
@@ -249,11 +249,10 @@ class MultiValueInputDialog(BaseDialog):
             row_frame = ctk.CTkFrame(fields_frame, fg_color="transparent")
             row_frame.pack(fill="x", pady=5)
 
-            label = ctk.CTkLabel(row_frame, text=field, width=100, anchor="w", font=("Courier New", 16))
+            label = self.create_label(row_frame, text=field)
             label.pack(side="left", padx=(0, 10))
 
-            entry = ctk.CTkEntry(row_frame, width=self.config.entry_width, 
-                                height=self.config.entry_height)
+            entry = self.create_entry(row_frame)
             entry.insert(0, self.defaults.get(field, ""))
             entry.pack(side="left", fill="x", expand=True)
 
@@ -264,10 +263,10 @@ class MultiValueInputDialog(BaseDialog):
         button_frame.place(relx=0.5, rely=0.8, anchor="center")
 
         submit_btn = self.create_button(button_frame, text="Submit", command=on_submit)
-        submit_btn.pack(side="left", padx=10)
+        submit_btn.pack(side="left", padx=5)
 
         cancel_btn = self.create_button(button_frame, text="Cancel", command=on_cancel)
-        cancel_btn.pack(side="left", padx=10)
+        cancel_btn.pack(side="left", padx=5)
 
 
 class MultiValueInput:

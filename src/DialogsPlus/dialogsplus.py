@@ -39,7 +39,8 @@ class DialogsPlus:
     def get_multi_value(self, fields, default=None):
         fields_list = fields if isinstance(fields, list) else [fields]
         calculated_height = 150 + (len(fields_list) * 40) + 60
-        max_field_length = max(len(field) for field in fields_list)
+        #max_field_length = max(len(field) for field in fields_list)
+        max_field_length = 20
         calculated_width = 300 + (max_field_length * 8)
         self.config.height = calculated_height
         self.config.width = calculated_width

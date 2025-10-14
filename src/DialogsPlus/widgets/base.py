@@ -74,38 +74,44 @@ class BaseDialog:
         self.result = {}
     
     def create_button(self, parent, text, command, **kwargs):
-        """Create a button with consistent styling from config"""
+        """Create a button with config styling"""
         return ctk.CTkButton(
             parent,
             text=text,
             command=command,
-            font=("Courier New", 16, "bold"),
+            font=self.config.button_font,
             fg_color=self.config.button_fg_color,
-            text_color="black",                    # Set button text color to black
-            hover_color=kwargs.get('hover_color', "#06bdb1"),  # Change hover background color (use any color you want)
+            text_color=self.config.button_text_color,
+            hover_color=self.config.button_hover_color,
             width=kwargs.get('width', self.config.button_width),
             height=kwargs.get('height', self.config.button_height),
-            **{k: v for k, v in kwargs.items() if k not in ['width', 'height', 'hover_color']}
+            **{k: v for k, v in kwargs.items() if k not in ['width', 'height']}
         )
-    
-    def create_label(self, parent, text, **kwargs):
-        """Create a label with consistent styling from config"""
-        
-        # Font configuration
-        font_family = kwargs.get('font_family', "Courier New")
-        font_size = kwargs.get('font_size', 16)
-        font_weight = kwargs.get('font_weight', "bold")
-        font = (font_family, font_size, font_weight)
 
+    def create_label(self, parent, text, **kwargs):
+        """Create a label with config styling"""
         return ctk.CTkLabel(
             parent,
             text=text,
-            font=font,
-            text_color=kwargs.get('text_color', "black"),
-            anchor=kwargs.get('anchor', "center"),  # Default anchor
-            justify=kwargs.get('justify', "left"),  # Text justification
-            wraplength=kwargs.get('wraplength', 0),  # 0 = no wrap
-            **{k: v for k, v in kwargs.items() if k not in ['font_family', 'font_size', 'font_weight', 'text_color', 'anchor', 'justify', 'wraplength']}
+            font=self.config.label_font,
+            text_color=self.config.label_text_color,
+            anchor=kwargs.get('anchor', "center"),
+            justify=kwargs.get('justify', "left"),
+            wraplength=kwargs.get('wraplength', 0),
+            **{k: v for k, v in kwargs.items() if k not in ['anchor', 'justify', 'wraplength']}
+        )
+    
+    def create_entry(self, parent, **kwargs):
+        """Create an entry with consistent styling from config"""
+        return ctk.CTkEntry(
+            parent,
+            width=kwargs.get('width', self.config.entry_width),
+            height=kwargs.get('height', self.config.entry_height),
+            font=kwargs.get('font', ("Courier New", 14)),
+            text_color=kwargs.get('text_color', "white"),
+            fg_color=kwargs.get('fg_color', "#212121"),
+            border_color=kwargs.get('border_color', "#46fff4"),
+            **{k: v for k, v in kwargs.items() if k not in ['width', 'height', 'font', 'text_color', 'fg_color', 'border_color']}
         )
 
 

@@ -12,7 +12,7 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
     - [✅] Like Get Value From User 
     - [❌] masks input (for passwords, tokens). Optional: hide/show toggle for user.
 
-- [❌] Get Multi-Value Input
+- [✅] Get Multi-Value Input
     - One dialog to get several values (name, email, password, etc.).
     - Returns a dictionary or list of values.
 
@@ -56,7 +56,7 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 
     ```
 
-- [❌] Get Confirmation From User
+- [✅] Get Confirmation From User
 
     ```bash
     ${answer}=    Get Confirmation From User
@@ -70,8 +70,8 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
     - Can return the selected date in a specific format (e.g., YYYY-MM-DD).
 
 - [✅] Display Timer Dialog
-    - Used in time-boxed manual tests.
-    - Could auto-close or proceed after timeout.
+    - [✅] Used in time-boxed manual tests.
+    - [❌] Could auto-close or proceed after timeout.
 
     ```bash
     Display Timer Dialog

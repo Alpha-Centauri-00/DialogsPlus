@@ -1,8 +1,6 @@
 from DialogsPlus.widgets.base import BaseDialog
-from robot.errors import ExecutionFailed
-from robot.api import logger
 import time
-import customtkinter as ctk
+
 
 
 class InputDialog(BaseDialog):
@@ -14,7 +12,7 @@ class InputDialog(BaseDialog):
         self.is_error = is_error
     
     def build_ui(self, app):
-        frame = ctk.CTkFrame(app, fg_color="transparent")
+        frame = self.create_frame(app)
         frame.pack(pady=8)
 
         label = self.create_label(frame, text=self.prompt)
@@ -56,7 +54,7 @@ class ManualStepDialog(BaseDialog):
 
         self.create_label(app, text=self.message).pack(pady=25)
 
-        button_frame = ctk.CTkFrame(app,fg_color="transparent")
+        button_frame = self.create_frame(app)
         button_frame.pack(pady=(10, self.config.spacing), expand=True)
 
         self.create_button(
@@ -82,7 +80,7 @@ class CountdownDialog(BaseDialog):
         label = self.create_label(app, text="")
         label.place(relx=0.5, rely=0.4, anchor="center")
 
-        progress = ctk.CTkProgressBar(app, width=300, height=12, progress_color="#00c0b5")
+        progress = self.create_progress_bar(app)
         progress.place(relx=0.5, rely=0.8, anchor="center")
         progress.set(0)
 
@@ -105,49 +103,6 @@ class CountdownDialog(BaseDialog):
         update()
 
 
-# Static methods for backwards compatibility / convenience
-class GetValueFromUserDialog:
-    @staticmethod
-    def show(prompt="Enter value:", default="", config=None):
-        dialog = InputDialog(prompt, default, config)
-        return dialog.show().get('value')
-
-
-class ExecuteManualStepDialog:
-    @staticmethod
-    def show(message="Please perform the step and confirm.", config=None):
-        logger.info(message)
-        
-        dialog = ManualStepDialog(message, config)
-        result = dialog.show()
-
-        if result.get("status") == "pass":
-            return
-        else:
-            failure_dialog = InputDialog("Test Failed - Reason:", "", config, is_error=True)
-            reason = failure_dialog.show().get('value', 'No reason provided')
-            logger.error(f"{message} | Reason: {reason}")
-            raise ExecutionFailed(reason)
-
-    @staticmethod
-    def run_steps(steps, config=None):
-        if isinstance(steps, str):
-            ExecuteManualStepDialog.show(steps, config)
-        elif isinstance(steps, list):
-            for step in steps:
-                ExecuteManualStepDialog.show(step, config)
-        else:
-            raise ExecutionFailed("Invalid input: must be a string or a list of strings.")
-
-
-class CountdownDialogRunner:
-    @staticmethod
-    def show(seconds=10, message="Please wait...", config=None):
-        logger.info(f"Starting countdown for {seconds} seconds...")
-        dialog = CountdownDialog(seconds, message, config)
-        dialog.show()
-
-
 class ConfirmationDialog(BaseDialog):
     def __init__(self, message, default="Yes", config=None):
         super().__init__(config)
@@ -155,10 +110,6 @@ class ConfirmationDialog(BaseDialog):
         self.default = default
     
     def build_ui(self, app):
-        # Build UI here
-        # Create label with message
-        # Create 3 buttons
-        # Set result based on which button clicked
 
         def on_yes():
             self.result["status"] = "yes"
@@ -177,7 +128,7 @@ class ConfirmationDialog(BaseDialog):
 
         self.create_label(app, text=self.message).pack(pady=25)
 
-        button_frame = ctk.CTkFrame(app,fg_color="transparent")
+        button_frame = self.create_frame(app)
         button_frame.pack(pady=(10, self.config.spacing), expand=True)
 
         self.create_button(
@@ -195,21 +146,6 @@ class ConfirmationDialog(BaseDialog):
             text="Cancel",
             command=on_cancel).pack(side="left", padx=5)
         
-
-class GetConfirmationFromUser:
-    @staticmethod
-    def show(message="Are you sure?", default="Yes", config=None):
-        logger.info(message)
-        dialog = ConfirmationDialog(message, default, config)
-        dialog.config.width = 450
-        result = dialog.show().get("status")
-        
-        if result == "yes":
-            return True
-        elif result == "no":
-            return False
-        else:  # cancel
-            return None
         
 
 
@@ -236,17 +172,17 @@ class MultiValueInputDialog(BaseDialog):
         app.bind('<Escape>', lambda e: on_cancel())
         app.bind('<Return>', lambda e: on_submit())
 
-        main_frame = ctk.CTkFrame(app, fg_color="transparent")
+        main_frame = self.create_frame(app)
         main_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         title = self.create_label(main_frame, text="Enter values")
         title.pack(pady=25)
 
-        fields_frame = ctk.CTkFrame(main_frame, fg_color="transparent")
+        fields_frame = self.create_frame(main_frame)
         fields_frame.pack(fill="both", expand=True)
 
         for field in self.fields:
-            row_frame = ctk.CTkFrame(fields_frame, fg_color="transparent")
+            row_frame = self.create_frame(fields_frame)
             row_frame.pack(fill="x", pady=5)
 
             label = self.create_label(row_frame, text=field)
@@ -259,7 +195,7 @@ class MultiValueInputDialog(BaseDialog):
             self.entries[field] = entry
 
         # Buttons
-        button_frame = ctk.CTkFrame(app, fg_color="transparent")
+        button_frame = self.create_frame(app)
         button_frame.place(relx=0.5, rely=0.8, anchor="center")
 
         submit_btn = self.create_button(button_frame, text="Submit", command=on_submit)
@@ -267,30 +203,3 @@ class MultiValueInputDialog(BaseDialog):
 
         cancel_btn = self.create_button(button_frame, text="Cancel", command=on_cancel)
         cancel_btn.pack(side="left", padx=5)
-
-
-class MultiValueInput:
-    @staticmethod
-    def show(fields, defaults=None, config=None):
-        logger.info(f"Showing input dialog for: {fields}")
-        dialog = MultiValueInputDialog(fields, defaults=defaults, config=config)
-        result = dialog.show()
-        if result.get("status") == "pass":
-            return result
-        else:
-            return None
-
-    @staticmethod
-    def run_multival(fields, config=None, defaults=None):
-        return MultiValueInput.show(fields, defaults=defaults, config=config)
-
-
-# def run_multi():
-#     fields = ['username', 'password', 'email','phone']
-#     defaults = {'username': 'admin'}
-#     result = MultiValueInput.run_multival(fields, defaults=defaults)
-#     print("User Input:", result)
-
-
-# if __name__ == "__main__":
-#     run_multi()

@@ -26,6 +26,11 @@ class DialogConfig:
         entry_text_color="white",
         entry_fg_color="#212121",
         entry_border_color="#46fff4",
+        frame_fg_color = "transparent",
+        progress_bar_width = 300,
+        progress_bar_height = 12,
+        progress_bar_color = "#00c0b5",
+
         
     ):
         self.title = title
@@ -34,7 +39,6 @@ class DialogConfig:
         self.theme = theme
         self.appearance_mode = appearance_mode
 
-        # New UI element configs
         self.button_width = button_width
         self.button_height = button_height
         self.label_font = label_font
@@ -50,7 +54,11 @@ class DialogConfig:
         self.entry_text_color = entry_text_color
         self.entry_fg_color = entry_fg_color
         self.entry_border_color = entry_border_color
-        
+        self.frame_fg_color = frame_fg_color
+        self.progress_bar_width = progress_bar_width
+        self.progress_bar_height = progress_bar_height
+        self.progress_bar_color = progress_bar_color
+
 
     @classmethod
     def from_yaml(cls, path: str):
@@ -73,13 +81,3 @@ class DialogConfig:
             spacing=data.get("spacing", 10),
             button_fg_color=data.get("button_fg_color", "#06bdb1")
         )
-
-    # def center_window(self, app, scaling):
-    #     app.update_idletasks()
-    #     screen_width = app.winfo_screenwidth()
-        
-    #     screen_width = app.winfo_screenwidth()
-    #     screen_height = app.winfo_screenheight()
-    #     x = int(((screen_width / 2) - (self.width / 2)) * scaling)
-    #     y = int(((screen_height / 2) - (self.height / 2)) * scaling)
-    #     app.geometry(f"{self.width}x{self.height}+{x}+{y}")

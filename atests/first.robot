@@ -51,3 +51,6 @@ testing
     ${lis}    Create List    username    password    email    phone
     &{def_val}    Create Dictionary    username=admin    password=P@55
     ${r}    Get Multi Value    ${lis}     default=${def_val}
+
+progress bar
+    Count Down    seconds=3

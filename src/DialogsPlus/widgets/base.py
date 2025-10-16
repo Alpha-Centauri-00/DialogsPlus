@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from DialogsPlus.utils.dialog_config import DialogConfig
+from DialogsPlus.utils.config import DialogConfig
 import os
 
 class BaseDialogRunner:
@@ -107,11 +107,27 @@ class BaseDialog:
             parent,
             width=kwargs.get('width', self.config.entry_width),
             height=kwargs.get('height', self.config.entry_height),
-            font=kwargs.get('font', ("Courier New", 14)),
-            text_color=kwargs.get('text_color', "white"),
-            fg_color=kwargs.get('fg_color', "#212121"),
-            border_color=kwargs.get('border_color', "#46fff4"),
+            font=kwargs.get('font', self.config.entry_font),
+            text_color=kwargs.get('text_color', self.config.entry_text_color),
+            fg_color=kwargs.get('fg_color', self.config.entry_fg_color),
+            border_color=kwargs.get('border_color', self.config.entry_border_color),
             **{k: v for k, v in kwargs.items() if k not in ['width', 'height', 'font', 'text_color', 'fg_color', 'border_color']}
+        )
+    
+    def create_frame(self, parent, **kwargs):
+        return ctk.CTkFrame(
+            parent,
+            fg_color=kwargs.get('fg_color', self.config.frame_fg_color),
+            **{k: v for k, v in kwargs.items() if k not in ['fg_color']}  # ← Add this
+        )
+        
+    def create_progress_bar(self, parent, **kwargs):
+        return ctk.CTkProgressBar(
+            parent,
+            width=kwargs.get('width', self.config.progress_bar_width),
+            height=kwargs.get('height', self.config.progress_bar_height),
+            progress_color=kwargs.get('progress_color', self.config.progress_bar_color),
+            **{k: v for k, v in kwargs.items() if k not in ['width', 'height', 'progress_color']}
         )
 
 

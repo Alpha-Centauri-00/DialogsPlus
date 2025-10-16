@@ -1,7 +1,11 @@
 from robot.api.deco import keyword
 import os
-from DialogsPlus.utils.dialog_config import DialogConfig
-from DialogsPlus.widgets.styling import GetValueFromUserDialog, ExecuteManualStepDialog, CountdownDialogRunner,GetConfirmationFromUser, MultiValueInput
+from DialogsPlus.utils.config import DialogConfig
+from DialogsPlus.widgets.wrappers import ( GetValueFromUserDialog, 
+                                          ExecuteManualStepDialog, 
+                                          CountdownDialogRunner,
+                                          GetConfirmationFromUser, 
+                                          MultiValueInput)
 
 
 ROBOT_LIBRARY_SCOPE = 'SUITE'

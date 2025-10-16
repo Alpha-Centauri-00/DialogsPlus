@@ -2,7 +2,9 @@ from DialogsPlus.widgets.styling import ( InputDialog,
                                           ManualStepDialog, 
                                           CountdownDialog, 
                                           ConfirmationDialog, 
-                                          MultiValueInputDialog)
+                                          MultiValueInputDialog,
+                                          FileDialog,
+                                          FolderDialog)
 from robot.api import logger
 from robot.errors import ExecutionFailed
 
@@ -79,3 +81,19 @@ class MultiValueInput:
     @staticmethod
     def run_multival(fields, config=None, defaults=None):
         return MultiValueInput.show(fields, defaults=defaults, config=config)
+
+class ChooseFromFileDialog:
+    @staticmethod
+    def show(message="", filetypes=None, multiple=False, config=None):
+        logger.info(f"Opening file picker: {message}")
+        dialog = FileDialog(message, filetypes, multiple, config)
+        result = dialog.show()
+        return result.get('files' if multiple else 'file')
+
+
+class ChooseFolderDialog:
+    @staticmethod
+    def show(message, config=None):
+        logger.info(f"Opening folder picker: {message}")
+        dialog = FolderDialog(message, config)
+        return dialog.show().get('folder')

@@ -5,7 +5,9 @@ from DialogsPlus.widgets.wrappers import ( GetValueFromUserDialog,
                                           ExecuteManualStepDialog, 
                                           CountdownDialogRunner,
                                           GetConfirmationFromUser, 
-                                          MultiValueInput)
+                                          MultiValueInput,
+                                          ChooseFromFileDialog,
+                                          ChooseFolderDialog)
 
 
 ROBOT_LIBRARY_SCOPE = 'SUITE'
@@ -49,3 +51,11 @@ class DialogsPlus:
         self.config.height = calculated_height
         self.config.width = calculated_width
         return MultiValueInput.run_multival(fields=fields,defaults=default,config=self.config)
+    
+    @keyword
+    def choose_file(self, message="",  filetypes=None, multiple=False):
+        return ChooseFromFileDialog.show( message, filetypes, multiple, self.config)
+
+    @keyword
+    def choose_folder(self, message):
+        return ChooseFolderDialog.show(message, self.config)

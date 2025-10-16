@@ -54,3 +54,12 @@ testing
 
 progress bar
     Count Down    seconds=3
+
+file testing
+    # Choose Folder    title=Choose folder please
+    ${HTML_FILETYPES}    Evaluate    [("HTML", "*.html")]
+    
+    ${r}    Choose File    message=choose something !!!    filetypes=${HTML_FILETYPES}    multiple=${True}
+
+folder testing
+    ${r}    Choose Folder    message=choose a folder you ass

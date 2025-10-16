@@ -1,4 +1,5 @@
 from DialogsPlus.widgets.base import BaseDialog
+from tkinter import filedialog
 import time
 
 
@@ -203,3 +204,73 @@ class MultiValueInputDialog(BaseDialog):
 
         cancel_btn = self.create_button(button_frame, text="Cancel", command=on_cancel)
         cancel_btn.pack(side="left", padx=5)
+
+
+
+
+
+class FileDialog(BaseDialog):
+    def __init__(self, message="", filetypes=None, multiple=False, config=None):
+        super().__init__(config)
+        self.title = self.config.title
+        self.message = message
+        self.filetypes = filetypes or [("All files", "*.*")]
+        self.multiple = multiple
+    
+    def build_ui(self, app):
+        # app.withdraw()  # Hide the main window
+        
+        def on_browse():
+            if self.multiple:
+                files = filedialog.askopenfilenames(title=self.title, filetypes=self.filetypes)
+                self.result['files'] = list(files) if files else None
+                app.quit()
+            else:
+                file = filedialog.askopenfilename(title=self.title, filetypes=self.filetypes)
+                self.result['file'] = file if file else None
+        
+                app.quit()
+
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+
+        self.create_label(app, text=self.message).pack(pady=25)
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+
+        self.create_button(
+            button_frame,
+            text="Browse",
+            command=on_browse).pack(side="bottom", padx=10)
+
+
+class FolderDialog(BaseDialog):
+    def __init__(self, message, config=None):
+        super().__init__(config)
+        self.title = self.config.title
+        self.message = message
+    
+    def build_ui(self, app):
+        #app.withdraw()  # Hide the main window
+        
+        def on_browser_folder():
+            folder = filedialog.askdirectory(title=self.title)
+            self.result['folder'] = folder if folder else None
+            app.quit()
+        
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+
+        self.create_label(app, text=self.message).pack(pady=25)
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+
+        self.create_button(
+            button_frame,
+            text="Browse",
+            command=on_browser_folder).pack(side="bottom", padx=10)
+        

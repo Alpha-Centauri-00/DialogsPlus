@@ -18,7 +18,10 @@ class InputDialog(BaseDialog):
 
         label = self.create_label(frame, text=self.prompt)
         label.pack() 
-        entry = self.create_entry(frame)
+
+        entry_frame = self.create_frame(app)
+        entry_frame.pack(pady=8)
+        entry = self.create_entry(entry_frame)
         entry.insert(0, self.default)
         entry.pack()
         
@@ -32,7 +35,9 @@ class InputDialog(BaseDialog):
         
         entry.focus_set()
         
-        self.create_button(app, text="Submit", command=on_submit).pack()
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=10)
+        self.create_button(button_frame, text="Submit", command=on_submit).pack()
 
 
 class ManualStepDialog(BaseDialog):

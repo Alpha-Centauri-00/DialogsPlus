@@ -21,9 +21,6 @@ class DialogsPlus:
         else:
             self.config = DialogConfig()  # use defaults
 
-    @keyword
-    def say_hello(self, name="World"):
-        return f"Hello, {name}!"
     
     @keyword
     def get_value_from_user(self, prompt="Enter value:", default=""):

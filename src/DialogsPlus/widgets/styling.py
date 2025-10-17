@@ -224,12 +224,12 @@ class FileDialog(BaseDialog):
             if self.multiple:
                 files = filedialog.askopenfilenames(title=self.title, filetypes=self.filetypes)
                 self.result['files'] = list(files) if files else None
-                app.quit()
+                
             else:
                 file = filedialog.askopenfilename(title=self.title, filetypes=self.filetypes)
                 self.result['file'] = file if file else None
         
-                app.quit()
+            app.quit()
 
         app.protocol("WM_DELETE_WINDOW", app.quit)
         app.bind('<Escape>', lambda e: app.quit())

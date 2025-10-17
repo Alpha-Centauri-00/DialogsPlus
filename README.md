@@ -12,7 +12,7 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 - [❌] Get Secure Input mask/toggle (show/hide password toggle)
 - [❌] Conditional Pause (pause based on variable/condition)
 - [❌] Display Timer auto-continue option
-- [❌] write robot tests in atest
+- [✅] write robot tests in atest
 
 ## Declined Features
 

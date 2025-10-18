@@ -1,4 +1,4 @@
-from DialogsPlus.widgets.base import BaseDialog, filedialog
+from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar
 import time
 
 
@@ -278,3 +278,26 @@ class FolderDialog(BaseDialog):
             text="Browse",
             command=on_browser_folder).pack(side="bottom", padx=10)
         
+
+class CheckboxConfirmationDialog(BaseDialog):
+    def __init__(self, message, checkbox_text="I agree", config=None):
+        super().__init__(config)
+        self.message = message
+        self.checkbox_text = checkbox_text
+    
+    def build_ui(self, app):
+        checkbox_var = BooleanVar(value=False)
+        
+        def on_submit():
+            self.result['confirmed'] = checkbox_var.get()
+            app.quit()
+        
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+        app.bind('<Return>', lambda e: on_submit())
+        
+        self.create_label(app, text=self.message).pack(pady=10)
+        
+        self.create_checkbox(app, text=self.checkbox_text, variable=checkbox_var).pack(pady=10)
+        
+        self.create_button(app, text="Submit", command=on_submit).pack(pady=10)

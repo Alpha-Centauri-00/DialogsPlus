@@ -54,3 +54,7 @@ Choose File Multiple
 Choose Folder Test
     ${result}=    Choose Folder    message=Select a directory
     Directory Should Exist    ${result}
+
+Single Ceckbox testing
+    ${r}    Confirm With Checkbox    message=Do you accept the terms?    checkbox_text=I accept, no matter what!
+    Should Be True    ${r}

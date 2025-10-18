@@ -4,7 +4,8 @@ from DialogsPlus.widgets.styling import ( InputDialog,
                                           ConfirmationDialog, 
                                           MultiValueInputDialog,
                                           FileDialog,
-                                          FolderDialog)
+                                          FolderDialog,
+                                          CheckboxConfirmationDialog)
 from robot.api import logger
 from robot.errors import ExecutionFailed
 
@@ -97,3 +98,12 @@ class ChooseFolderDialog:
         logger.info(f"Opening folder picker: {message}")
         dialog = FolderDialog(message, config)
         return dialog.show().get('folder')
+    
+
+class ConfirmWithCheckbox:
+    @staticmethod
+    def show(message, checkbox_text="I agree", config=None):
+        logger.info(f"Showing checkbox confirmation: {message}")
+        dialog = CheckboxConfirmationDialog(message, checkbox_text, config)
+        result = dialog.show()
+        return result.get('confirmed', False)

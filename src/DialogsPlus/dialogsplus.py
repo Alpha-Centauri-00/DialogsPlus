@@ -7,7 +7,8 @@ from DialogsPlus.widgets.wrappers import ( GetValueFromUserDialog,
                                           GetConfirmationFromUser, 
                                           MultiValueInput,
                                           ChooseFromFileDialog,
-                                          ChooseFolderDialog)
+                                          ChooseFolderDialog,
+                                          ConfirmWithCheckbox)
 
 
 ROBOT_LIBRARY_SCOPE = 'SUITE'
@@ -56,3 +57,8 @@ class DialogsPlus:
     @keyword
     def choose_folder(self, message):
         return ChooseFolderDialog.show(message, self.config)
+    
+
+    @keyword
+    def confirm_with_checkbox(self, message, checkbox_text="I agree"):
+        return ConfirmWithCheckbox.show(message, checkbox_text, self.config)

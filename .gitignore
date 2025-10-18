@@ -75,3 +75,4 @@ cython_debug/
 
 # Robot Framework output files in atests/
 results
+.vscode

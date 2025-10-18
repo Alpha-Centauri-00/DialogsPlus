@@ -5,20 +5,21 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 
 - Not supported in headless environments such as CI/CD pipelines (e.g., Jenkins, GitHub Actions)
 
-## Planned Features
 
-- [❌] Get Date From User (date picker dialog)
-- [❌] Confirm With Checkbox (checkbox confirmation dialog)
-- [❌] Get Secure Input mask/toggle (show/hide password toggle)
-- [❌] Conditional Pause (pause based on variable/condition)
-- [❌] Display Timer auto-continue option
-- [✅] write robot tests in atest
+**DialogsPlus** is a user-friendly and fully customizable dialog library for [Robot Framework](https://robotframework.org/), built on top of [`customtkinter`](https://github.com/TomSchimansky/CustomTkinter). It extends the built-in dialog functionality with rich GUI dialogs that are **stylish**, **modern**, and **configurable** via a simple `config.yaml` file.
 
-## Declined Features
+---
 
-- Show HTML Message (complexity not justified)
-- Live Variable Inspector (out of scope)
-    
-### 🤝 Contributing
+## ✨ Features
+
+- Easy-to-use dialogs for user interaction during test runs
+- Full GUI-based interface using `customtkinter`
+- Customizable look and feel (colors, fonts, sizes, etc.) via `config.yaml`
+- Drop-in replacement for standard Robot Framework dialogs
+- Supports dynamic sizing based on input fields or options
+
+---
+
+
 
 Pull requests are welcome! More info coming soon.

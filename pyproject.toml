@@ -6,7 +6,9 @@ readme = "README.md"
 authors = [
     { name = "Alpha-Centauri-00", email = "Alpha@Centauri.c0m" }
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.10"
+license = "MIT"
+
 dependencies = [
     "customtkinter>=5.2.2",
     "pyyaml>=6.0.3",

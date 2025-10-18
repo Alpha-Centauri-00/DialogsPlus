@@ -9,7 +9,7 @@ class DialogConfig:
         width=400,
         height=150,
         theme="blue",
-        appearance_mode="system",
+        appearance_mode="dark",
 
         button_width=120,
         button_height=32,

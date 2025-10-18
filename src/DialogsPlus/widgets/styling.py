@@ -301,3 +301,37 @@ class CheckboxConfirmationDialog(BaseDialog):
         self.create_checkbox(app, text=self.checkbox_text, variable=checkbox_var).pack(pady=10)
         
         self.create_button(app, text="Submit", command=on_submit).pack(pady=10)
+
+
+class MultiCheckboxDialog(BaseDialog):
+    def __init__(self, message, options, defaults=None, config=None):
+        super().__init__(config)
+        self.message = message
+        self.options = options if isinstance(options, list) else options.split('|')
+        self.defaults = defaults or []
+        self.checkbox_vars = {}
+    
+    def build_ui(self, app):
+        def on_submit():
+            self.result = {option: var.get() for option, var in self.checkbox_vars.items()}
+            app.quit()
+        
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+        app.bind('<Return>', lambda e: on_submit())
+        
+        self.create_label(app, text=self.message).pack(pady=20)
+        
+        # Checkboxes frame
+        checkbox_frame = self.create_frame(app)
+        checkbox_frame.pack(pady=10, padx=20, fill="both", expand=True)
+        
+        for option in self.options:
+            var = BooleanVar(value=(option in self.defaults))
+            self.checkbox_vars[option] = var
+            
+            self.create_checkbox(checkbox_frame, text=option, variable=var).pack(
+                anchor="w", pady=5, padx=10
+            )
+        
+        self.create_button(app, text="Submit", command=on_submit).pack(pady=20)

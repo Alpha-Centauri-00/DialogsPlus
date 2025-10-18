@@ -5,7 +5,8 @@ from DialogsPlus.widgets.styling import ( InputDialog,
                                           MultiValueInputDialog,
                                           FileDialog,
                                           FolderDialog,
-                                          CheckboxConfirmationDialog)
+                                          CheckboxConfirmationDialog,
+                                          MultiCheckboxDialog)
 from robot.api import logger
 from robot.errors import ExecutionFailed
 
@@ -107,3 +108,11 @@ class ConfirmWithCheckbox:
         dialog = CheckboxConfirmationDialog(message, checkbox_text, config)
         result = dialog.show()
         return result.get('confirmed', False)
+    
+
+class SelectOptionsWithCheckboxes:
+    @staticmethod
+    def show(message, options, defaults=None, config=None):
+        logger.info(f"Showing multi-checkbox dialog: {message}")
+        dialog = MultiCheckboxDialog(message, options, defaults, config)
+        return dialog.show()

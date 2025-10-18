@@ -8,7 +8,8 @@ from DialogsPlus.widgets.wrappers import ( GetValueFromUserDialog,
                                           MultiValueInput,
                                           ChooseFromFileDialog,
                                           ChooseFolderDialog,
-                                          ConfirmWithCheckbox)
+                                          ConfirmWithCheckbox,
+                                          SelectOptionsWithCheckboxes)
 
 
 ROBOT_LIBRARY_SCOPE = 'SUITE'
@@ -62,3 +63,28 @@ class DialogsPlus:
     @keyword
     def confirm_with_checkbox(self, message, checkbox_text="I agree"):
         return ConfirmWithCheckbox.show(message, checkbox_text, self.config)
+    
+
+    @keyword
+    def select_options_with_checkboxes(self, message, options, defaults=None):
+        """Show multiple checkboxes and return selected options as dictionary."""
+        
+        options_list = options if isinstance(options, list) else options.split('|')
+        
+        # Base sizing
+        num_options = len(options_list)
+        max_option_length = max(len(opt) for opt in options_list)
+        message_length = len(message)
+        
+        # Height: base + checkboxes + some buffer
+        calculated_height = 180 + (num_options * 40)
+        
+        # Width: consider both message and longest option
+        width_from_message = min(600, max(300, message_length * 7))
+        width_from_options = max(300, 200 + (max_option_length * 8))
+        calculated_width = max(width_from_message, width_from_options)
+        
+        self.config.height = calculated_height
+        self.config.width = calculated_width
+        
+        return SelectOptionsWithCheckboxes.show(message, options, defaults, self.config)

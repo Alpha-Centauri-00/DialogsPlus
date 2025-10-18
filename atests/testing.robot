@@ -3,7 +3,14 @@ Library           DialogsPlus    #config=D:/robotframework-dialogsplus/atests/co
 Library           OperatingSystem
 
 Suite Setup       Set Log Level    level=TRACE
-Test Setup        Log To Console    \n*** Running Test: ${TEST NAME} ***
+Test Setup        Log Test Case Name
+
+
+*** Keywords ***
+Log Test Case Name
+    [Tags]    robot:flatten
+    Log    <p style="background-color: #06bdb1; font-weight: bold; display: inline-block; padding: 4px;">*** Running Test: ${TEST NAME} ***</p>    html=${True}
+
 
 *** Variables ***
 
@@ -41,20 +48,40 @@ Get Multi Value Multiple Fields
     Should Be Equal    ${result}[password]    P@55
     Should Be Equal    ${result}[phone]       1234567
 
-Choose File Single
+Choose Single XML File
     ${XML_FILETYPES}    Evaluate    [("xml files", "*.xml")]
-    ${result}=    Choose File    message=Select file to upload    filetypes=${XML_FILETYPES}
+    ${result}=    Choose File    message=Select Single XML File    filetypes=${XML_FILETYPES}
     Should Contain    ${result}    .xml
 
-Choose File Multiple
+Choose Multiple HTML Files
     ${HTML_FILETYPES}    Evaluate    [("HTML", "*.html")]
-    ${result}=    Choose File    message=Select multiple files    filetypes=${HTML_FILETYPES}   multiple=True
+    ${result}=    Choose File    message=Select Multiple HTML Files    filetypes=${HTML_FILETYPES}   multiple=True
     Should Contain    ${result}[0]    .html
 
 Choose Folder Test
-    ${result}=    Choose Folder    message=Select a directory
+    ${result}=    Choose Folder    message=Select Any Directory
     Directory Should Exist    ${result}
 
-Single Ceckbox testing
+Single Ceckbox Test
     ${r}    Confirm With Checkbox    message=Do you accept the terms?    checkbox_text=I accept, no matter what!
     Should Be True    ${r}
+
+Select Many Checkbox Test
+    ${r}    Select Options With Checkboxes    message=Select as much as you want   options=${fields_val}
+    Should Not Be True    ${r}[username]
+    Should Not Be True    ${r}[password]
+    Should Not Be True    ${r}[email]
+    Should Not Be True    ${r}[phone]
+
+Select Many Checkbox With Defaults Test
+    @{Contacts}    Create List        Email    SMS    Phone    Slack    Discord
+    ${selected}=    Select Options With Checkboxes
+    ...    message=Choose your preferences
+    ...    options=${Contacts}
+    ...    defaults=Email,SMS        # Default Selected!
+    
+    Should Be True        ${selected}[Email]
+    Should Be True        ${selected}[SMS]
+    Should Not Be True    ${selected}[Phone]
+    Should Not Be True    ${selected}[Slack]
+    Should Not Be True    ${selected}[Discord]

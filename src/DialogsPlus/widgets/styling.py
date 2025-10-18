@@ -1,5 +1,4 @@
-from DialogsPlus.widgets.base import BaseDialog
-from tkinter import filedialog
+from DialogsPlus.widgets.base import BaseDialog, filedialog
 import time
 
 

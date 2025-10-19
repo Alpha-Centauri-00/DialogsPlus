@@ -20,6 +20,7 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 
 ---
 
+View DialogsPlus Library [Documentation](docs/DialogsPlus.html)
 
 
 Pull requests are welcome! More info coming soon.

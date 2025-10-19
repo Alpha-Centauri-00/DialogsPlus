@@ -20,7 +20,10 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 
 ---
 
-View DialogsPlus Library [Documentation](https://github.com/Alpha-Centauri-00/DialogsPlus/DialogsPlus.html)
+## 📚 Keyword Documentation
+
+👉 View DialogsPlus Keyword [Docs](https://github.com/Alpha-Centauri-00/DialogsPlus/docs/DialogsPlus.html)
+
 
 
 Pull requests are welcome! More info coming soon.

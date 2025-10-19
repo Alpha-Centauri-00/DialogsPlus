@@ -22,7 +22,7 @@ Log Test Case Name
 *** Test Cases ***
 
 Get Value From User Default
-    ${result}    Get Value From User    
+    ${result}    Get Value From User Input   
     ...    prompt=Enter your name:    
     ...    default=Robot framework
     
@@ -103,4 +103,4 @@ Select Many Checkbox With Defaults Test
     Should Not Be True    ${selected}[Discord]
 
 Pause The Test
-    Pause Execution    message=Check If System Is Running!
+    Pause Test Execution    message=Check If System Is Running!

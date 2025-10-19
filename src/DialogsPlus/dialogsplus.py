@@ -45,7 +45,7 @@ class DialogsPlus:
             self.config = DialogConfig()
 
     @keyword
-    def get_value_from_user(self, prompt: str = "Enter value:", default: str = "") -> Optional[str]:
+    def get_value_from_user_input(self, prompt: str = "Enter value:", default: str = "") -> Optional[str]:
         """Prompts user for text input via dialog.
         
         Arguments:
@@ -172,7 +172,7 @@ class DialogsPlus:
     
 
     @keyword
-    def pause_execution(self, message: str = "Test execution paused") -> None:
+    def pause_test_execution(self, message: str = "Test execution paused") -> None:
         """Pauses test execution until user clicks Continue.
         
         Arguments:

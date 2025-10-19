@@ -39,6 +39,9 @@ class BaseDialogRunner:
         
         app = ctk.CTk()
         app.title(config.title)
+        app.lift()  # Bring to front
+        app.attributes('-topmost', True)  # Force on top
+        app.after(100, lambda: app.attributes('-topmost', False)) 
 
         icon_path = os.path.join(os.path.dirname(__file__), "assets", "robot.ico")
         try:

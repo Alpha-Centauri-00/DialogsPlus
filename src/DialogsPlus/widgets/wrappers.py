@@ -1,12 +1,15 @@
-from DialogsPlus.widgets.styling import ( InputDialog, 
-                                          ManualStepDialog, 
-                                          CountdownDialog, 
-                                          ConfirmationDialog, 
-                                          MultiValueInputDialog,
-                                          FileDialog,
-                                          FolderDialog,
-                                          CheckboxConfirmationDialog,
-                                          MultiCheckboxDialog)
+from DialogsPlus.widgets.styling import ( 
+    InputDialog, 
+    ManualStepDialog, 
+    CountdownDialog, 
+    ConfirmationDialog, 
+    MultiValueInputDialog,
+    FileDialog,
+    FolderDialog,
+    CheckboxConfirmationDialog,
+    MultiCheckboxDialog,
+    PauseDialog)
+
 from robot.api import logger
 from robot.errors import ExecutionFailed
 
@@ -116,3 +119,12 @@ class SelectOptionsWithCheckboxes:
         logger.info(f"Showing multi-checkbox dialog: {message}")
         dialog = MultiCheckboxDialog(message, options, defaults, config)
         return dialog.show()
+    
+
+
+class PauseExecution:
+    @staticmethod
+    def show(message="Test execution paused", config=None):
+        logger.info(f"Test paused: {message}")
+        dialog = PauseDialog(message, config)
+        dialog.show()

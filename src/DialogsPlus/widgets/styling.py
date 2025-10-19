@@ -335,3 +335,21 @@ class MultiCheckboxDialog(BaseDialog):
             )
         
         self.create_button(app, text="Submit", command=on_submit).pack(pady=20)
+
+
+
+class PauseDialog(BaseDialog):
+    def __init__(self, message="Test execution paused", config=None):
+        super().__init__(config)
+        self.message = message
+    
+    def build_ui(self, app):
+        def on_continue():
+            app.quit()
+        
+        app.protocol("WM_DELETE_WINDOW", on_continue)
+        app.bind('<Return>', lambda e: on_continue())
+        app.bind('<Escape>', lambda e: on_continue())
+        
+        self.create_label(app, text=self.message).pack(pady=20)
+        self.create_button(app, text="Continue", command=on_continue).pack(pady=20)

@@ -101,3 +101,6 @@ Select Many Checkbox With Defaults Test
     Should Not Be True    ${selected}[Phone]
     Should Not Be True    ${selected}[Slack]
     Should Not Be True    ${selected}[Discord]
+
+Pause The Test
+    Pause Execution    message=Check If System Is Running!

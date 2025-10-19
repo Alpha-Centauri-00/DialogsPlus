@@ -11,7 +11,8 @@ from DialogsPlus.widgets.wrappers import (
     ChooseFromFileDialog,
     ChooseFolderDialog,
     ConfirmWithCheckbox,
-    SelectOptionsWithCheckboxes
+    SelectOptionsWithCheckboxes,
+    PauseExecution
 )
 
 
@@ -151,3 +152,15 @@ class DialogsPlus:
         self.config.width = calculated_width
         
         return SelectOptionsWithCheckboxes.show(message, options, defaults, self.config)
+    
+
+    @keyword
+    def pause_execution(self, message: str = "Test execution paused") -> None:
+        """Pauses test execution until user clicks Continue.
+        
+        Arguments:
+            - message: Text displayed in dialog
+        
+        Test resumes when user clicks Continue button.
+        """
+        PauseExecution.show(message, self.config)

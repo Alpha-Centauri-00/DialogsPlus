@@ -1,6 +1,6 @@
 [project]
 name = "robotframework-dialogsplus" 
-version = "0.1.0"
+version = "0.1.1"
 description = "A drop-in enhancement for Robot Framework's Dialogs library with modern UI and extended user interaction keywords."
 readme = "README.md"
 authors = [

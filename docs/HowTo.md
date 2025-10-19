@@ -41,7 +41,7 @@ Should Be Equal    ${result}    Robot framework
 ```
 
 📝 `Run Manual Steps`
-Displays a list of manual steps with Pass and Fail buttons.
+Displays manual test steps with Pass/Fail buttons.
 
 ```r
 ${steps}    Create List    
@@ -61,19 +61,16 @@ Count Down    5
 ❓ `Get Confirmation` Displays a Yes / No / Cancel dialog.
 ```r
 ${result}    Get Confirmation    Are you sure?
+Should Be True    ${result}
 ```
 🧮 `Get Multi Value` Prompts for multiple input fields in a single dialog.
 ```r
-*** Variables ***
-@{fields}         username    password
-&{default}        username=user1    password=P@55
-
 *** Test Cases ***
-Get Multi Value Test
-    ${result}    Get Multi Value    ${fields}    default=${default}
+Get Value Test
+    ${result}    Get Multi Value    username
     Should Be Equal    ${result}[username]    user1
 
-    # Or another approach, with many fields!
+    # Or another approach, with more fields!
 
 *** Variables ***
 @{fields_val}     username    password    email    phone

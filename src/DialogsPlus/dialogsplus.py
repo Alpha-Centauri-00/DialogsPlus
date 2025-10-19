@@ -19,6 +19,23 @@ from DialogsPlus.widgets.wrappers import (
 ROBOT_LIBRARY_SCOPE = 'SUITE'
 
 class DialogsPlus:
+    """
+    DialogsPlus is a modern, customizable drop-in enhancement for Robot Framework’s Dialogs library, built on top of customtkinter.
+
+    This library extends standard dialog capabilities with stylish and user-friendly GUI dialogs, supporting customization of colors, fonts, and sizes via an external config.yaml file.
+
+    Features:
+        - Easy-to-use dialogs for interactive test runs.
+        - Full GUI interface using customtkinter.
+        - Customizable appearance (colors, fonts, sizes, etc.) through config.yaml.
+        - Dynamic sizing based on user input or options.
+        - Drop-in replacement for Robot Framework’s standard Dialogs library.
+
+    Note:
+        - Not supported in headless environments (e.g., CI/CD pipelines like Jenkins or GitHub Actions).
+
+    DialogsPlus is ideal for enhancing user interactions in Robot Framework tests with modern UI elements and extended keyword support.
+    """
 
     def __init__(self, config: Optional[str] = None):
         """Initialize DialogsPlus library with optional YAML config file."""

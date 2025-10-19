@@ -30,7 +30,7 @@ pip install robotframework-dialogsplus
 
 👉 View DialogsPlus Keyword [Docs](https://alpha-centauri-00.github.io/DialogsPlus/DialogsPlus.html)
 
-👉 More Example of [HowTo](https://alpha-centauri-00.github.io/DialogsPlus/HowTo.md)
+👉 More Example of [HowTo](https://github.com/alpha-centauri-00/DialogsPlus/blob/main/HowTo.md)
 
 
 Pull requests are welcome! More info coming soon.

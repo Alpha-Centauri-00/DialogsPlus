@@ -22,7 +22,10 @@ Log Test Case Name
 *** Test Cases ***
 
 Get Value From User Default
-    ${result}    Get Value From User    prompt=Enter your name:    default=Robot framework
+    ${result}    Get Value From User    
+    ...    prompt=Enter your name:    
+    ...    default=Robot framework
+    
     Should Be Equal    ${result}    Robot framework
 
 Run Manual Steps Executes
@@ -50,12 +53,18 @@ Get Multi Value Multiple Fields
 
 Choose Single XML File
     ${XML_FILETYPES}    Evaluate    [("xml files", "*.xml")]
-    ${result}=    Choose File    message=Select Single XML File    filetypes=${XML_FILETYPES}
+    ${result}=    Choose File    
+    ...    message=Select Single XML File    
+    ...    filetypes=${XML_FILETYPES}
+    
     Should Contain    ${result}    .xml
 
 Choose Multiple HTML Files
     ${HTML_FILETYPES}    Evaluate    [("HTML", "*.html")]
-    ${result}=    Choose File    message=Select Multiple HTML Files    filetypes=${HTML_FILETYPES}   multiple=True
+    ${result}=    Choose File    
+    ...    message=Select Multiple HTML Files    
+    ...    filetypes=${HTML_FILETYPES}   multiple=True
+
     Should Contain    ${result}[0]    .html
 
 Choose Folder Test
@@ -63,11 +72,17 @@ Choose Folder Test
     Directory Should Exist    ${result}
 
 Single Ceckbox Test
-    ${r}    Confirm With Checkbox    message=Do you accept the terms?    checkbox_text=I accept, no matter what!
+    ${r}    Confirm With Checkbox    
+    ...    message=Do you accept the terms?    
+    ...    checkbox_text=I accept, no matter what!
+
     Should Be True    ${r}
 
 Select Many Checkbox Test
-    ${r}    Select Options With Checkboxes    message=Select as much as you want   options=${fields_val}
+    ${r}    Select Options With Checkboxes    
+    ...    message=Select as much as you want   
+    ...    options=${fields_val}
+
     Should Not Be True    ${r}[username]
     Should Not Be True    ${r}[password]
     Should Not Be True    ${r}[email]
@@ -75,10 +90,11 @@ Select Many Checkbox Test
 
 Select Many Checkbox With Defaults Test
     @{Contacts}    Create List        Email    SMS    Phone    Slack    Discord
+    @{Selected_Defaults}    Create List    Email    SMS
     ${selected}=    Select Options With Checkboxes
     ...    message=Choose your preferences
     ...    options=${Contacts}
-    ...    defaults=Email,SMS        # Default Selected!
+    ...    defaults=@{Selected_Defaults}         # Default Selected!
     
     Should Be True        ${selected}[Email]
     Should Be True        ${selected}[SMS]

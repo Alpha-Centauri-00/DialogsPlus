@@ -19,12 +19,18 @@ A drop-in enhancement for Robot Framework's Dialogs library with modern UI and e
 - Supports dynamic sizing based on input fields or options
 
 ---
+## Installation
+
+```bach
+pip install robotframework-dialogsplus
+```
+
 
 ## 📚 Keyword Documentation
 
 👉 View DialogsPlus Keyword [Docs](https://alpha-centauri-00.github.io/DialogsPlus/DialogsPlus.html)
 
-
+👉 More Example of [HowTo](https://alpha-centauri-00.github.io/DialogsPlus/HowTo.md)
 
 
 Pull requests are welcome! More info coming soon.

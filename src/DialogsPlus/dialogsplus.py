@@ -1,19 +1,21 @@
 from robot.api.deco import keyword
+from robot.errors import ExecutionFailed
 from typing import Any, Dict, List, Union, Optional
 import copy
 import os
 from DialogsPlus.utils.config import DialogConfig
 from DialogsPlus.widgets.wrappers import (
-    GetValueFromUserDialog, 
-    ExecuteManualStepDialog, 
+    GetValueFromUserDialog,
+    ExecuteManualStepDialog,
     CountdownDialogRunner,
-    GetConfirmationFromUser, 
+    GetConfirmationFromUser,
     MultiValueInput,
     ChooseFromFileDialog,
     ChooseFolderDialog,
     ConfirmWithCheckbox,
     SelectOptionsWithCheckboxes,
-    PauseExecution
+    PauseExecution,
+    BuildCustomDialog
 )
 
 
@@ -44,6 +46,17 @@ class DialogsPlus:
             self.config = DialogConfig.from_yaml(config)
         else:
             self.config = DialogConfig()
+        self._dialog_builder: Optional[Dict[str, Any]] = None
+
+    def _require_builder(self) -> Dict[str, Any]:
+        if self._dialog_builder is None:
+            raise ExecutionFailed("No dialog in progress - call 'Create Dialog' first.")
+        return self._dialog_builder
+
+    def _register_element_name(self, builder: Dict[str, Any], name: str) -> None:
+        if name in builder["names"]:
+            raise ExecutionFailed(f"Element name '{name}' was already added to this dialog.")
+        builder["names"].add(name)
 
     @keyword
     def get_value_from_user_input(self, prompt: str = "Enter value:", default: str = "") -> Optional[str]:
@@ -199,3 +212,114 @@ class DialogsPlus:
             config = copy.copy(self.config)
             config.height = max(self.config.height, 260)
         PauseExecution.show(message, command, command_args, config)
+
+    @keyword
+    def create_dialog(self, title: str = "Custom Dialog") -> None:
+        """Starts building a custom dialog with your own combination of elements.
+
+        Arguments:
+            - title: Window title for the dialog
+
+        Add elements with Add Text Box / Add Checkbox / Add Label / Add Button, then call
+        Show Dialog to display it and get the results.
+
+        Raises ExecutionFailed if a dialog is already being built (Show Dialog wasn't
+        called yet for a previous Create Dialog).
+        """
+        if self._dialog_builder is not None:
+            raise ExecutionFailed("Create Dialog was already called - call 'Show Dialog' before starting a new one.")
+        self._dialog_builder = {"title": title, "elements": [], "names": set()}
+
+    @keyword
+    def add_text_box(self, name: str, label: Optional[str] = None, default: str = "") -> None:
+        """Adds a text input field to the dialog being built with Create Dialog.
+
+        Arguments:
+            - name: Key used for this field's value in Show Dialog's result
+            - label: Text shown next to the field (defaults to name)
+            - default: Pre-filled value
+
+        Raises ExecutionFailed if called before Create Dialog, or if name was already used.
+        """
+        builder = self._require_builder()
+        self._register_element_name(builder, name)
+        builder["elements"].append({"type": "text_box", "name": name, "label": label or name, "default": default})
+
+    @keyword
+    def add_checkbox(self, name: str, label: Optional[str] = None, default: bool = False) -> None:
+        """Adds a checkbox to the dialog being built with Create Dialog.
+
+        Arguments:
+            - name: Key used for this field's True/False value in Show Dialog's result
+            - label: Text shown next to the checkbox (defaults to name)
+            - default: Whether the checkbox starts checked
+
+        Raises ExecutionFailed if called before Create Dialog, or if name was already used.
+        """
+        builder = self._require_builder()
+        self._register_element_name(builder, name)
+        builder["elements"].append({"type": "checkbox", "name": name, "label": label or name, "default": default})
+
+    @keyword
+    def add_label(self, text: str) -> None:
+        """Adds a plain text line to the dialog being built with Create Dialog.
+
+        Arguments:
+            - text: Text to display
+
+        Purely visual - not included in Show Dialog's result. Raises ExecutionFailed if
+        called before Create Dialog.
+        """
+        builder = self._require_builder()
+        builder["elements"].append({"type": "label", "text": text})
+
+    @keyword
+    def add_button(self, text: str, command: Optional[str] = None, command_args: Optional[List[str]] = None, closes_dialog: bool = True) -> None:
+        """Adds a button to the dialog being built with Create Dialog.
+
+        Arguments:
+            - text: Button label, and the value recorded under result['button'] if it
+              closes the dialog
+            - command: Optional keyword name to run when clicked, via Robot Framework's
+              Run Keyword - must be a keyword already available in the running suite
+            - command_args: Optional list of arguments passed to that keyword
+            - closes_dialog: If True (default), clicking this button runs its command (if
+              any), collects the current field values, and closes the dialog. If False,
+              the button only runs its command and the dialog stays open - e.g. for a
+              "Run Diagnostics" action next to OK/Cancel.
+
+        Raises ExecutionFailed if called before Create Dialog.
+        """
+        builder = self._require_builder()
+        builder["elements"].append({
+            "type": "button",
+            "text": text,
+            "command": command,
+            "command_args": command_args,
+            "closes_dialog": closes_dialog,
+        })
+
+    @keyword
+    def show_dialog(self) -> Dict[str, Any]:
+        """Displays the dialog built with Create Dialog/Add ... keywords and returns the results.
+
+        Returns a dictionary with one entry per named field (from Add Text Box/Add
+        Checkbox), plus 'button' set to the text of whichever closing button was clicked.
+
+        Raises ExecutionFailed if no dialog is in progress, if no closing button (Add
+        Button with closes_dialog=True, the default) was added, or if the button that
+        closed the dialog had a command that failed.
+        """
+        builder = self._require_builder()
+        if not any(e["type"] == "button" and e.get("closes_dialog", True) for e in builder["elements"]):
+            self._dialog_builder = None
+            raise ExecutionFailed("Show Dialog requires at least one button with closes_dialog=True (the default) so the dialog can be closed.")
+
+        config = copy.copy(self.config)
+        config.height = max(self.config.height, 150 + len(builder["elements"]) * 45)
+        config.width = max(self.config.width, 400)
+
+        try:
+            return BuildCustomDialog.show(builder["title"], builder["elements"], config=config)
+        finally:
+            self._dialog_builder = None

@@ -1,14 +1,15 @@
-from DialogsPlus.widgets.styling import ( 
-    InputDialog, 
-    ManualStepDialog, 
-    CountdownDialog, 
-    ConfirmationDialog, 
+from DialogsPlus.widgets.styling import (
+    InputDialog,
+    ManualStepDialog,
+    CountdownDialog,
+    ConfirmationDialog,
     MultiValueInputDialog,
     FileDialog,
     FolderDialog,
     CheckboxConfirmationDialog,
     MultiCheckboxDialog,
-    PauseDialog)
+    PauseDialog,
+    DynamicDialog)
 
 from robot.api import logger
 from robot.errors import ExecutionFailed
@@ -131,3 +132,15 @@ class PauseExecution:
         error = result.get('command_error')
         if error:
             raise ExecutionFailed(error)
+
+
+class BuildCustomDialog:
+    @staticmethod
+    def show(title, elements, config=None):
+        logger.info(f"Showing custom dialog: {title}")
+        dialog = DynamicDialog(title, elements, config)
+        result = dialog.show()
+        error = result.pop('command_error', None)
+        if error:
+            raise ExecutionFailed(error)
+        return result

@@ -136,3 +136,39 @@ Pause The Test With Command That Fails
     EXCEPT    AS    ${error}
         Log    Caught expected failure: ${error}
     END
+
+Create Dialog With Text Box And Checkbox
+    Create Dialog    title=Login Form
+    Add Text Box    name=username    label=Username    default=admin
+    Add Checkbox    name=remember_me    label=Remember Me
+    Add Button    text=OK
+    Add Button    text=Cancel
+    ${result}    Show Dialog
+    Log    Button clicked: ${result}[button]
+    Log    Username: ${result}[username]
+    Log    Remember me: ${result}[remember_me]
+
+
+Create Dialog With Side Command Button
+    Create Dialog    title=Diagnostics
+    Add Label    text=Run diagnostics before continuing if you like.
+    Add Button    text=Run Diagnostics    command=log Hello    closes_dialog=False
+    Add Button    text=OK
+    ${result}    Show Dialog
+    Should Be Equal    ${result}[button]    OK
+
+Add Text Box Fails Without Create Dialog First
+    TRY
+        Add Text Box    name=orphan
+    EXCEPT    AS    ${error}
+        Log    Caught expected failure: ${error}
+    END
+
+Create Dialog Fails Without A Closing Button
+    Create Dialog    title=No Closing Button
+    Add Label    text=This has no OK/Cancel button
+    TRY
+        Show Dialog
+    EXCEPT    AS    ${error}
+        Log    Caught expected failure: ${error}
+    END

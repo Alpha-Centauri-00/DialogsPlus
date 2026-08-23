@@ -381,3 +381,75 @@ class PauseDialog(BaseDialog):
 
         if status_label is not None:
             status_label.pack(pady=(0, 10))
+
+
+class DynamicDialog(BaseDialog):
+    def __init__(self, title, elements, config=None):
+        super().__init__(config)
+        self.dialog_title = title
+        self.elements = elements
+        self.field_widgets = {}
+
+    def build_ui(self, app):
+        app.title(self.dialog_title)
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+
+        fields_frame = self.create_frame(app)
+        fields_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        for element in self.elements:
+            etype = element["type"]
+
+            if etype == "label":
+                self.create_label(fields_frame, text=element["text"]).pack(anchor="w", pady=(0, self.config.spacing))
+
+            elif etype == "text_box":
+                row = self.create_frame(fields_frame)
+                row.pack(fill="x", pady=5)
+                self.create_label(row, text=element["label"]).pack(side="left", padx=(0, 10))
+                entry = self.create_entry(row)
+                entry.insert(0, element.get("default", ""))
+                entry.pack(side="left", fill="x", expand=True)
+                self.field_widgets[element["name"]] = ("text_box", entry)
+
+            elif etype == "checkbox":
+                var = BooleanVar(value=element.get("default", False))
+                self.create_checkbox(fields_frame, text=element["label"], variable=var).pack(anchor="w", pady=5)
+                self.field_widgets[element["name"]] = ("checkbox", var)
+
+        status_label = self.create_label(app, text="")
+
+        def collect_field_values():
+            values = {}
+            for name, (etype, widget) in self.field_widgets.items():
+                values[name] = widget.get() if etype == "text_box" else bool(widget.get())
+            return values
+
+        def make_handler(element):
+            def handler():
+                if element.get("command"):
+                    try:
+                        BuiltIn().run_keyword(element["command"], *(element.get("command_args") or []))
+                        logger.info(f"Ran command keyword: {element['command']}")
+                        status_label.configure(text=f"Ran '{element['command']}'")
+                        self.result.pop('command_error', None)
+                    except Exception as e:
+                        logger.error(f"Command keyword '{element['command']}' failed: {e}")
+                        status_label.configure(text=f"'{element['command']}' failed: {e}")
+                        self.result['command_error'] = str(e)
+
+                if element.get("closes_dialog", True):
+                    self.result.update(collect_field_values())
+                    self.result["button"] = element["text"]
+                    app.quit()
+            return handler
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+        for element in self.elements:
+            if element["type"] == "button":
+                self.create_button(button_frame, text=element["text"], command=make_handler(element)).pack(side="left", padx=5)
+
+        status_label.pack(pady=(0, 10))

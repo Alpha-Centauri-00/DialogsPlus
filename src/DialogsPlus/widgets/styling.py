@@ -1,4 +1,4 @@
-from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar
+from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar, StringVar
 from robot.api import logger
 from robot.libraries.BuiltIn import BuiltIn
 import time
@@ -419,12 +419,24 @@ class DynamicDialog(BaseDialog):
                 self.create_checkbox(fields_frame, text=element["label"], variable=var).pack(anchor="w", pady=5)
                 self.field_widgets[element["name"]] = ("checkbox", var)
 
+            elif etype == "radio_group":
+                group_frame = self.create_frame(fields_frame)
+                group_frame.pack(fill="x", pady=5, anchor="w")
+                self.create_label(group_frame, text=element["label"]).pack(anchor="w")
+                var = StringVar(value=element["default"])
+                for option in element["options"]:
+                    self.create_radio_button(group_frame, text=option, variable=var, value=option).pack(anchor="w", padx=10, pady=2)
+                self.field_widgets[element["name"]] = ("radio_group", var)
+
         status_label = self.create_label(app, text="")
 
         def collect_field_values():
             values = {}
             for name, (etype, widget) in self.field_widgets.items():
-                values[name] = widget.get() if etype == "text_box" else bool(widget.get())
+                if etype == "checkbox":
+                    values[name] = bool(widget.get())
+                else:
+                    values[name] = widget.get()
             return values
 
         def make_handler(element):

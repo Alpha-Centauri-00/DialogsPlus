@@ -179,4 +179,18 @@ Create Dialog With Masked Text Box
     Add Text Box    name=password    label=Password    mask=True
     Add Button    text=OK
     ${result}    Show Dialog
-    
+
+Create Dialog With Radio Group
+    Create Dialog    title=Test Result
+    Add Radio Group    name=verdict    label=Verdict    options=Pass|Fail|Blocked    default=Pass
+    Add Button    text=OK
+    ${result}    Show Dialog
+    Should Contain    ${{['Pass', 'Fail', 'Blocked']}}    ${result}[verdict]
+    Log    Verdict selected: ${result}[verdict]
+
+Add Radio Group Fail and Pass
+    Create Dialog    title=Verdict
+    Add Radio Group    name=verdict    options=Pass|Fail    default=Pass
+    Add Button    text=OK
+    ${result}    Show Dialog
+    Should Be Equal    ${result}[verdict]    Pass

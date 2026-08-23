@@ -1,5 +1,5 @@
 import customtkinter as ctk
-from customtkinter import BooleanVar, IntVar
+from customtkinter import BooleanVar, IntVar, StringVar
 from DialogsPlus.utils.config import DialogConfig
 from tkinter import filedialog
 import os
@@ -12,7 +12,8 @@ __all__ = [
     'ctk',
     'BooleanVar',
     'filedialog',
-    'IntVar'
+    'IntVar',
+    'StringVar'
 ]
 
 class BaseDialogRunner:
@@ -149,6 +150,18 @@ class BaseDialog:
     def create_checkbox(self, parent, text="", **kwargs):
         """Create a checkbox with consistent styling from config"""
         return ctk.CTkCheckBox(
+            parent,
+            text=text,
+            font=kwargs.get('font', self.config.label_font),
+            text_color=kwargs.get('text_color', self.config.label_text_color),
+            fg_color=kwargs.get('fg_color', self.config.button_fg_color),
+            hover_color=kwargs.get('hover_color', self.config.button_hover_color),
+            **{k: v for k, v in kwargs.items() if k not in ['font', 'text_color', 'fg_color', 'hover_color']}
+        )
+
+    def create_radio_button(self, parent, text="", **kwargs):
+        """Create a radio button with consistent styling from config"""
+        return ctk.CTkRadioButton(
             parent,
             text=text,
             font=kwargs.get('font', self.config.label_font),

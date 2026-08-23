@@ -58,6 +58,14 @@ class DialogsPlus:
             raise ExecutionFailed(f"Element name '{name}' was already added to this dialog.")
         builder["names"].add(name)
 
+    def _validate_options(self, kind: str, name: str, options: Union[str, List[str]], default: Optional[str]) -> List[str]:
+        options_list = options if isinstance(options, list) else options.split('|')
+        if not options_list:
+            raise ExecutionFailed(f"{kind} '{name}' needs at least one option.")
+        if default is not None and default not in options_list:
+            raise ExecutionFailed(f"Default '{default}' is not one of the options for {kind.lower()} '{name}': {options_list}")
+        return options_list
+
     @keyword
     def get_value_from_user_input(self, prompt: str = "Enter value:", default: str = "") -> Optional[str]:
         """Prompts user for text input via dialog.
@@ -220,8 +228,8 @@ class DialogsPlus:
         Arguments:
             - title: Window title for the dialog
 
-        Add elements with Add Text Box / Add Checkbox / Add Radio Group / Add Label /
-        Add Button, then call Show Dialog to display it and get the results.
+        Add elements with Add Text Box / Add Checkbox / Add Radio Group / Add Dropdown /
+        Add Label / Add Button, then call Show Dialog to display it and get the results.
 
         Raises ExecutionFailed if a dialog is already being built (Show Dialog wasn't
         called yet for a previous Create Dialog).
@@ -275,14 +283,34 @@ class DialogsPlus:
         options is empty, or if default isn't one of the options.
         """
         builder = self._require_builder()
-        options_list = options if isinstance(options, list) else options.split('|')
-        if not options_list:
-            raise ExecutionFailed(f"Radio group '{name}' needs at least one option.")
-        if default is not None and default not in options_list:
-            raise ExecutionFailed(f"Default '{default}' is not one of the options for radio group '{name}': {options_list}")
+        options_list = self._validate_options("Radio group", name, options, default)
         self._register_element_name(builder, name)
         builder["elements"].append({
             "type": "radio_group",
+            "name": name,
+            "label": label or name,
+            "options": options_list,
+            "default": default or options_list[0],
+        })
+
+    @keyword
+    def add_dropdown(self, name: str, options: Union[str, List[str]], label: Optional[str] = None, default: Optional[str] = None) -> None:
+        """Adds a dropdown (single choice) to the dialog being built with Create Dialog.
+
+        Arguments:
+            - name: Key used for this field's selected value in Show Dialog's result
+            - options: List of choices, or a pipe-separated string (e.g. 'Chrome|Firefox|Edge')
+            - label: Text shown next to the dropdown (defaults to name)
+            - default: Which option starts selected (defaults to the first option)
+
+        Raises ExecutionFailed if called before Create Dialog, if name was already used, if
+        options is empty, or if default isn't one of the options.
+        """
+        builder = self._require_builder()
+        options_list = self._validate_options("Dropdown", name, options, default)
+        self._register_element_name(builder, name)
+        builder["elements"].append({
+            "type": "dropdown",
             "name": name,
             "label": label or name,
             "options": options_list,

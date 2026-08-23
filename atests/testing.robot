@@ -194,3 +194,22 @@ Add Radio Group Fail and Pass
     Add Button    text=OK
     ${result}    Show Dialog
     Should Be Equal    ${result}[verdict]    Pass
+
+Create Dialog With Dropdown
+    Create Dialog    title=Browser Selection
+    Add Dropdown    name=browser    label=Browser    options=Chrome|Firefox|Edge    default=Firefox
+    Add Button    text=OK
+    ${result}    Show Dialog
+    Log    Browser selected: ${result}[browser]
+
+Add Dropdown Fails With Bad Default
+    Create Dialog    title=Bad Dropdown Default
+    TRY
+        Add Dropdown    name=browser    options=Chrome|Firefox    default=Safari
+    EXCEPT    AS    ${error}
+        Log    Caught expected failure: ${error}
+    END
+    Add Dropdown    name=browser    options=Chrome|Firefox    default=Chrome
+    Add Button    text=OK
+    ${result}    Show Dialog
+    Should Be Equal    ${result}[browser]    Chrome

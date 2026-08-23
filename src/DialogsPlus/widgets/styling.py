@@ -42,11 +42,13 @@ class InputDialog(BaseDialog):
 
 
 class ManualStepDialog(BaseDialog):
-    
-    def __init__(self, message, config=None):
+
+    def __init__(self, message, config=None, step_number=None, total_steps=None):
         super().__init__(config)
         self.message = message
-    
+        self.step_number = step_number
+        self.total_steps = total_steps
+
     def build_ui(self, app):
         def on_pass():
             self.result["status"] = "pass"
@@ -58,6 +60,17 @@ class ManualStepDialog(BaseDialog):
 
         app.protocol("WM_DELETE_WINDOW", app.quit)
         app.bind('<Escape>', lambda e: app.quit())
+
+        if self.step_number and self.total_steps:
+            family = self.config.label_font[0]
+            size = self.config.label_font[1] if len(self.config.label_font) > 1 else 12
+            step_font = (family, max(10, size - 10), *self.config.label_font[2:])
+            self.create_label(
+                app,
+                text=f"Step {self.step_number} of {self.total_steps}",
+                font=step_font,
+                anchor="w",
+            ).pack(anchor="nw", padx=5, pady=(0, 0))
 
         self.create_label(app, text=self.message).pack(pady=25)
 
@@ -427,6 +440,14 @@ class DynamicDialog(BaseDialog):
                 for option in element["options"]:
                     self.create_radio_button(group_frame, text=option, variable=var, value=option).pack(anchor="w", padx=10, pady=2)
                 self.field_widgets[element["name"]] = ("radio_group", var)
+
+            elif etype == "dropdown":
+                row = self.create_frame(fields_frame)
+                row.pack(fill="x", pady=5)
+                self.create_label(row, text=element["label"]).pack(side="left", padx=(0, 10))
+                var = StringVar(value=element["default"])
+                self.create_dropdown(row, values=element["options"], variable=var).pack(side="left", fill="x", expand=True)
+                self.field_widgets[element["name"]] = ("dropdown", var)
 
         status_label = self.create_label(app, text="")
 

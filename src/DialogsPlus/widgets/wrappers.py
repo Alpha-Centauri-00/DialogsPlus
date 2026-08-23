@@ -24,10 +24,10 @@ class GetValueFromUserDialog:
 
 class ExecuteManualStepDialog:
     @staticmethod
-    def show(message="Please perform the step and confirm.", config=None):
+    def show(message="Please perform the step and confirm.", config=None, step_number=None, total_steps=None):
         logger.info(message)
-        
-        dialog = ManualStepDialog(message, config)
+
+        dialog = ManualStepDialog(message, config, step_number, total_steps)
         result = dialog.show()
 
         if result.get("status") == "pass":
@@ -43,8 +43,9 @@ class ExecuteManualStepDialog:
         if isinstance(steps, str):
             ExecuteManualStepDialog.show(steps, config)
         elif isinstance(steps, list):
-            for step in steps:
-                ExecuteManualStepDialog.show(step, config)
+            total_steps = len(steps)
+            for index, step in enumerate(steps, start=1):
+                ExecuteManualStepDialog.show(step, config, step_number=index, total_steps=total_steps)
         else:
             raise ExecutionFailed("Invalid input: must be a string or a list of strings.")
         

@@ -29,8 +29,21 @@ Get Value From User Default
     Should Be Equal    ${result}    Robot framework
 
 Run Manual Steps Executes
-    ${steps}    Create List    Open the app    Click Start button    Verify status
+    VAR    @{steps}        
+    ...    Open the app    
+    ...    Click Start button    
+    ...    Verify status
+
     Run Manual Steps    ${steps}
+    Log    Manual steps executed successfully
+
+Run Manual Steps Executes With Plain Args
+    Run Manual Steps    
+    ...                open github    
+    ...                add username    
+    ...                add password    
+    ...                press login
+    
     Log    Manual steps executed successfully
 
 Count Down Runs

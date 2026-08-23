@@ -57,15 +57,20 @@ class DialogsPlus:
         return GetValueFromUserDialog.show(prompt, default, config=self.config)
 
     @keyword
-    def run_manual_steps(self, steps: Union[str, List[str]]) -> None:
+    def run_manual_steps(self, *steps) -> None:
         """Displays manual test steps with Pass/Fail buttons.
-        
+
         Arguments:
-            - steps: Single step string or list of step strings
-        
+            - steps: One step per argument (e.g. `open github    add username    add password`),
+              or a single list/string variable (e.g. `${steps}`)
+
         Raises ExecutionFailed if user clicks Fail button.
         """
-        ExecuteManualStepDialog.run_steps(steps, config=self.config)
+        if len(steps) == 1 and isinstance(steps[0], list):
+            steps_list = steps[0]
+        else:
+            steps_list = list(steps)
+        ExecuteManualStepDialog.run_steps(steps_list, config=self.config)
 
     @keyword
     def count_down(self, seconds: Union[int, str]) -> None:

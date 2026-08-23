@@ -1,14 +1,15 @@
-from DialogsPlus.widgets.styling import ( 
-    InputDialog, 
-    ManualStepDialog, 
-    CountdownDialog, 
-    ConfirmationDialog, 
+from DialogsPlus.widgets.styling import (
+    InputDialog,
+    ManualStepDialog,
+    CountdownDialog,
+    ConfirmationDialog,
     MultiValueInputDialog,
     FileDialog,
     FolderDialog,
     CheckboxConfirmationDialog,
     MultiCheckboxDialog,
-    PauseDialog)
+    PauseDialog,
+    DynamicDialog)
 
 from robot.api import logger
 from robot.errors import ExecutionFailed
@@ -23,10 +24,10 @@ class GetValueFromUserDialog:
 
 class ExecuteManualStepDialog:
     @staticmethod
-    def show(message="Please perform the step and confirm.", config=None):
+    def show(message="Please perform the step and confirm.", config=None, step_number=None, total_steps=None):
         logger.info(message)
-        
-        dialog = ManualStepDialog(message, config)
+
+        dialog = ManualStepDialog(message, config, step_number, total_steps)
         result = dialog.show()
 
         if result.get("status") == "pass":
@@ -42,8 +43,9 @@ class ExecuteManualStepDialog:
         if isinstance(steps, str):
             ExecuteManualStepDialog.show(steps, config)
         elif isinstance(steps, list):
-            for step in steps:
-                ExecuteManualStepDialog.show(step, config)
+            total_steps = len(steps)
+            for index, step in enumerate(steps, start=1):
+                ExecuteManualStepDialog.show(step, config, step_number=index, total_steps=total_steps)
         else:
             raise ExecutionFailed("Invalid input: must be a string or a list of strings.")
         
@@ -124,7 +126,42 @@ class SelectOptionsWithCheckboxes:
 
 class PauseExecution:
     @staticmethod
-    def show(message="Test execution paused", config=None):
+    def show(message="Test execution paused", command=None, command_args=None, config=None):
         logger.info(f"Test paused: {message}")
-        dialog = PauseDialog(message, config)
-        dialog.show()
+        dialog = PauseDialog(message, command, command_args, config)
+        result = dialog.show()
+        error = result.get('command_error')
+        if error:
+            raise ExecutionFailed(error)
+
+
+class MaskedResult(dict):
+    """A dict whose masked keys print as '***' when Robot Framework logs it
+    (e.g. the automatic '${result} = ...' assignment message), while normal
+    item access (${result}[key]) still returns the real value."""
+
+    def __init__(self, data, masked_keys):
+        super().__init__(data)
+        self._masked_keys = set(masked_keys)
+
+    def _display(self, value, key):
+        return "'***'" if key in self._masked_keys else repr(value)
+
+    def __repr__(self):
+        items = ", ".join(f"{k!r}: {self._display(v, k)}" for k, v in self.items())
+        return "{" + items + "}"
+
+    __str__ = __repr__
+
+
+class BuildCustomDialog:
+    @staticmethod
+    def show(title, elements, config=None):
+        logger.info(f"Showing custom dialog: {title}")
+        dialog = DynamicDialog(title, elements, config)
+        result = dialog.show()
+        error = result.pop('command_error', None)
+        if error:
+            raise ExecutionFailed(error)
+        masked_keys = [e["name"] for e in elements if e["type"] == "text_box" and e.get("mask")]
+        return MaskedResult(result, masked_keys)

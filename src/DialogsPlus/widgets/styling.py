@@ -1,4 +1,6 @@
-from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar
+from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar, StringVar
+from robot.api import logger
+from robot.libraries.BuiltIn import BuiltIn
 import time
 
 
@@ -40,11 +42,13 @@ class InputDialog(BaseDialog):
 
 
 class ManualStepDialog(BaseDialog):
-    
-    def __init__(self, message, config=None):
+
+    def __init__(self, message, config=None, step_number=None, total_steps=None):
         super().__init__(config)
         self.message = message
-    
+        self.step_number = step_number
+        self.total_steps = total_steps
+
     def build_ui(self, app):
         def on_pass():
             self.result["status"] = "pass"
@@ -56,6 +60,17 @@ class ManualStepDialog(BaseDialog):
 
         app.protocol("WM_DELETE_WINDOW", app.quit)
         app.bind('<Escape>', lambda e: app.quit())
+
+        if self.step_number and self.total_steps:
+            family = self.config.label_font[0]
+            size = self.config.label_font[1] if len(self.config.label_font) > 1 else 12
+            step_font = (family, max(10, size - 10), *self.config.label_font[2:])
+            self.create_label(
+                app,
+                text=f"Step {self.step_number} of {self.total_steps}",
+                font=step_font,
+                anchor="w",
+            ).pack(anchor="nw", padx=5, pady=(0, 0))
 
         self.create_label(app, text=self.message).pack(pady=25)
 
@@ -339,17 +354,136 @@ class MultiCheckboxDialog(BaseDialog):
 
 
 class PauseDialog(BaseDialog):
-    def __init__(self, message="Test execution paused", config=None):
+    def __init__(self, message="Test execution paused", command=None, command_args=None, config=None):
         super().__init__(config)
         self.message = message
-    
+        self.command = command
+        self.command_args = command_args or []
+
     def build_ui(self, app):
         def on_continue():
             app.quit()
-        
+
         app.protocol("WM_DELETE_WINDOW", on_continue)
         app.bind('<Return>', lambda e: on_continue())
         app.bind('<Escape>', lambda e: on_continue())
-        
+
         self.create_label(app, text=self.message).pack(pady=20)
-        self.create_button(app, text="Continue", command=on_continue).pack(pady=20)
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+        status_label = None
+        if self.command:
+            status_label = self.create_label(app, text="")
+
+            def on_run_command():
+                try:
+                    BuiltIn().run_keyword(self.command, *self.command_args)
+                    logger.info(f"Ran command keyword: {self.command}")
+                    status_label.configure(text=f"Ran '{self.command}'")
+                    self.result.pop('command_error', None)
+                except Exception as e:
+                    logger.error(f"Command keyword '{self.command}' failed: {e}")
+                    status_label.configure(text=f"'{self.command}' failed: {e}")
+                    self.result['command_error'] = str(e)
+
+            self.create_button(button_frame, text="Run", command=on_run_command).pack(side="left", padx=5)
+
+        self.create_button(button_frame, text="Continue", command=on_continue).pack(side="left", padx=5)
+
+        if status_label is not None:
+            status_label.pack(pady=(0, 10))
+
+
+class DynamicDialog(BaseDialog):
+    def __init__(self, title, elements, config=None):
+        super().__init__(config)
+        self.dialog_title = title
+        self.elements = elements
+        self.field_widgets = {}
+
+    def build_ui(self, app):
+        app.title(self.dialog_title)
+        app.protocol("WM_DELETE_WINDOW", app.quit)
+        app.bind('<Escape>', lambda e: app.quit())
+
+        fields_frame = self.create_frame(app)
+        fields_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        for element in self.elements:
+            etype = element["type"]
+
+            if etype == "label":
+                self.create_label(fields_frame, text=element["text"]).pack(anchor="w", pady=(0, self.config.spacing))
+
+            elif etype == "text_box":
+                row = self.create_frame(fields_frame)
+                row.pack(fill="x", pady=5)
+                self.create_label(row, text=element["label"]).pack(side="left", padx=(0, 10))
+                entry_kwargs = {"show": "•"} if element.get("mask") else {}
+                entry = self.create_entry(row, **entry_kwargs)
+                entry.insert(0, element.get("default", ""))
+                entry.pack(side="left", fill="x", expand=True)
+                self.field_widgets[element["name"]] = ("text_box", entry)
+
+            elif etype == "checkbox":
+                var = BooleanVar(value=element.get("default", False))
+                self.create_checkbox(fields_frame, text=element["label"], variable=var).pack(anchor="w", pady=5)
+                self.field_widgets[element["name"]] = ("checkbox", var)
+
+            elif etype == "radio_group":
+                group_frame = self.create_frame(fields_frame)
+                group_frame.pack(fill="x", pady=5, anchor="w")
+                self.create_label(group_frame, text=element["label"]).pack(anchor="w")
+                var = StringVar(value=element["default"])
+                for option in element["options"]:
+                    self.create_radio_button(group_frame, text=option, variable=var, value=option).pack(anchor="w", padx=10, pady=2)
+                self.field_widgets[element["name"]] = ("radio_group", var)
+
+            elif etype == "dropdown":
+                row = self.create_frame(fields_frame)
+                row.pack(fill="x", pady=5)
+                self.create_label(row, text=element["label"]).pack(side="left", padx=(0, 10))
+                var = StringVar(value=element["default"])
+                self.create_dropdown(row, values=element["options"], variable=var).pack(side="left", fill="x", expand=True)
+                self.field_widgets[element["name"]] = ("dropdown", var)
+
+        status_label = self.create_label(app, text="")
+
+        def collect_field_values():
+            values = {}
+            for name, (etype, widget) in self.field_widgets.items():
+                if etype == "checkbox":
+                    values[name] = bool(widget.get())
+                else:
+                    values[name] = widget.get()
+            return values
+
+        def make_handler(element):
+            def handler():
+                if element.get("command"):
+                    try:
+                        BuiltIn().run_keyword(element["command"], *(element.get("command_args") or []))
+                        logger.info(f"Ran command keyword: {element['command']}")
+                        status_label.configure(text=f"Ran '{element['command']}'")
+                        self.result.pop('command_error', None)
+                    except Exception as e:
+                        logger.error(f"Command keyword '{element['command']}' failed: {e}")
+                        status_label.configure(text=f"'{element['command']}' failed: {e}")
+                        self.result['command_error'] = str(e)
+
+                if element.get("closes_dialog", True):
+                    self.result.update(collect_field_values())
+                    self.result["button"] = element["text"]
+                    app.quit()
+            return handler
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+        for element in self.elements:
+            if element["type"] == "button":
+                self.create_button(button_frame, text=element["text"], command=make_handler(element)).pack(side="left", padx=5)
+
+        status_label.pack(pady=(0, 10))

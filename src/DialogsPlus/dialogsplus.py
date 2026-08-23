@@ -231,19 +231,20 @@ class DialogsPlus:
         self._dialog_builder = {"title": title, "elements": [], "names": set()}
 
     @keyword
-    def add_text_box(self, name: str, label: Optional[str] = None, default: str = "") -> None:
+    def add_text_box(self, name: str, label: Optional[str] = None, default: str = "", mask: bool = False) -> None:
         """Adds a text input field to the dialog being built with Create Dialog.
 
         Arguments:
             - name: Key used for this field's value in Show Dialog's result
             - label: Text shown next to the field (defaults to name)
             - default: Pre-filled value
+            - mask: If True, displays entered text as asterisks (for passwords/secrets)
 
         Raises ExecutionFailed if called before Create Dialog, or if name was already used.
         """
         builder = self._require_builder()
         self._register_element_name(builder, name)
-        builder["elements"].append({"type": "text_box", "name": name, "label": label or name, "default": default})
+        builder["elements"].append({"type": "text_box", "name": name, "label": label or name, "default": default, "mask": mask})
 
     @keyword
     def add_checkbox(self, name: str, label: Optional[str] = None, default: bool = False) -> None:

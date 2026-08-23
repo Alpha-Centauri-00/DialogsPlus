@@ -408,7 +408,8 @@ class DynamicDialog(BaseDialog):
                 row = self.create_frame(fields_frame)
                 row.pack(fill="x", pady=5)
                 self.create_label(row, text=element["label"]).pack(side="left", padx=(0, 10))
-                entry = self.create_entry(row)
+                entry_kwargs = {"show": "•"} if element.get("mask") else {}
+                entry = self.create_entry(row, **entry_kwargs)
                 entry.insert(0, element.get("default", ""))
                 entry.pack(side="left", fill="x", expand=True)
                 self.field_widgets[element["name"]] = ("text_box", entry)

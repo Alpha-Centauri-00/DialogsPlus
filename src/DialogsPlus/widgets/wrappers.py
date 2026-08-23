@@ -134,6 +134,25 @@ class PauseExecution:
             raise ExecutionFailed(error)
 
 
+class MaskedResult(dict):
+    """A dict whose masked keys print as '***' when Robot Framework logs it
+    (e.g. the automatic '${result} = ...' assignment message), while normal
+    item access (${result}[key]) still returns the real value."""
+
+    def __init__(self, data, masked_keys):
+        super().__init__(data)
+        self._masked_keys = set(masked_keys)
+
+    def _display(self, value, key):
+        return "'***'" if key in self._masked_keys else repr(value)
+
+    def __repr__(self):
+        items = ", ".join(f"{k!r}: {self._display(v, k)}" for k, v in self.items())
+        return "{" + items + "}"
+
+    __str__ = __repr__
+
+
 class BuildCustomDialog:
     @staticmethod
     def show(title, elements, config=None):
@@ -143,4 +162,5 @@ class BuildCustomDialog:
         error = result.pop('command_error', None)
         if error:
             raise ExecutionFailed(error)
-        return result
+        masked_keys = [e["name"] for e in elements if e["type"] == "text_box" and e.get("mask")]
+        return MaskedResult(result, masked_keys)

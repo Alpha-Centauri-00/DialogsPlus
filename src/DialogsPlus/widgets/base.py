@@ -158,8 +158,6 @@ class BaseDialog:
             **{k: v for k, v in kwargs.items() if k not in ['font', 'text_color', 'fg_color', 'hover_color']}
         )
 
-
-# testing this shit
     
     def show(self):
         def ui(app):

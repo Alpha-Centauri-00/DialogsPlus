@@ -172,3 +172,11 @@ Create Dialog Fails Without A Closing Button
     EXCEPT    AS    ${error}
         Log    Caught expected failure: ${error}
     END
+
+Create Dialog With Masked Text Box
+    Create Dialog    title=Login Form
+    Add Text Box    name=username    label=Username    default=admin
+    Add Text Box    name=password    label=Password    mask=True
+    Add Button    text=OK
+    ${result}    Show Dialog
+    

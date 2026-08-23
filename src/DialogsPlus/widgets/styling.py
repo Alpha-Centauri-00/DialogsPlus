@@ -1,4 +1,6 @@
 from DialogsPlus.widgets.base import BaseDialog, filedialog, BooleanVar, IntVar
+from robot.api import logger
+from robot.libraries.BuiltIn import BuiltIn
 import time
 
 
@@ -339,17 +341,43 @@ class MultiCheckboxDialog(BaseDialog):
 
 
 class PauseDialog(BaseDialog):
-    def __init__(self, message="Test execution paused", config=None):
+    def __init__(self, message="Test execution paused", command=None, command_args=None, config=None):
         super().__init__(config)
         self.message = message
-    
+        self.command = command
+        self.command_args = command_args or []
+
     def build_ui(self, app):
         def on_continue():
             app.quit()
-        
+
         app.protocol("WM_DELETE_WINDOW", on_continue)
         app.bind('<Return>', lambda e: on_continue())
         app.bind('<Escape>', lambda e: on_continue())
-        
+
         self.create_label(app, text=self.message).pack(pady=20)
-        self.create_button(app, text="Continue", command=on_continue).pack(pady=20)
+
+        button_frame = self.create_frame(app)
+        button_frame.pack(pady=(10, self.config.spacing), expand=True)
+
+        status_label = None
+        if self.command:
+            status_label = self.create_label(app, text="")
+
+            def on_run_command():
+                try:
+                    BuiltIn().run_keyword(self.command, *self.command_args)
+                    logger.info(f"Ran command keyword: {self.command}")
+                    status_label.configure(text=f"Ran '{self.command}'")
+                    self.result.pop('command_error', None)
+                except Exception as e:
+                    logger.error(f"Command keyword '{self.command}' failed: {e}")
+                    status_label.configure(text=f"'{self.command}' failed: {e}")
+                    self.result['command_error'] = str(e)
+
+            self.create_button(button_frame, text="Run", command=on_run_command).pack(side="left", padx=5)
+
+        self.create_button(button_frame, text="Continue", command=on_continue).pack(side="left", padx=5)
+
+        if status_label is not None:
+            status_label.pack(pady=(0, 10))

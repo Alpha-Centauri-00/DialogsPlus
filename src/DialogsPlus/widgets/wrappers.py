@@ -124,7 +124,10 @@ class SelectOptionsWithCheckboxes:
 
 class PauseExecution:
     @staticmethod
-    def show(message="Test execution paused", config=None):
+    def show(message="Test execution paused", command=None, command_args=None, config=None):
         logger.info(f"Test paused: {message}")
-        dialog = PauseDialog(message, config)
-        dialog.show()
+        dialog = PauseDialog(message, command, command_args, config)
+        result = dialog.show()
+        error = result.get('command_error')
+        if error:
+            raise ExecutionFailed(error)

@@ -1,5 +1,6 @@
 from robot.api.deco import keyword
 from typing import Any, Dict, List, Union, Optional
+import copy
 import os
 from DialogsPlus.utils.config import DialogConfig
 from DialogsPlus.widgets.wrappers import (
@@ -177,12 +178,24 @@ class DialogsPlus:
     
 
     @keyword
-    def pause_test_execution(self, message: str = "Test execution paused") -> None:
+    def pause_test_execution(self, message: str = "Test execution paused", command: Optional[str] = None, command_args: Optional[List[str]] = None) -> None:
         """Pauses test execution until user clicks Continue.
-        
+
         Arguments:
             - message: Text displayed in dialog
-        
+            - command: Optional keyword name. When given, an extra "Run" button is shown
+              next to Continue that runs it via Robot Framework's Run Keyword, so it must
+              be a keyword already available in the running suite (user keyword, resource
+              file, or imported library) - can be clicked any number of times while paused.
+            - command_args: Optional list of arguments passed to that keyword
+
         Test resumes when user clicks Continue button.
+
+        Raises ExecutionFailed if the most recent "Run" click failed (e.g. the keyword
+        doesn't exist or raised an error).
         """
-        PauseExecution.show(message, self.config)
+        config = self.config
+        if command:
+            config = copy.copy(self.config)
+            config.height = max(self.config.height, 260)
+        PauseExecution.show(message, command, command_args, config)

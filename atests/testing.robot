@@ -2,8 +2,8 @@
 Library           DialogsPlus    #config=D:/robotframework-dialogsplus/atests/config.yaml
 Library           OperatingSystem
 
-Suite Setup       Set Log Level    level=TRACE
-Test Setup        Log Test Case Name
+# Suite Setup       Set Log Level    level=TRACE
+# Test Setup        Log Test Case Name
 
 
 *** Keywords ***
@@ -11,6 +11,8 @@ Log Test Case Name
     [Tags]    robot:flatten
     Log    <p style="background-color: #06bdb1; font-weight: bold; display: inline-block; padding: 4px;">*** Running Test: ${TEST NAME} ***</p>    html=${True}
 
+log Hello
+    Log     Hello    level=WARN
 
 *** Variables ***
 
@@ -43,7 +45,7 @@ Run Manual Steps Executes With Plain Args
     ...                add username    
     ...                add password    
     ...                press login
-    
+
     Log    Manual steps executed successfully
 
 Count Down Runs
@@ -117,3 +119,20 @@ Select Many Checkbox With Defaults Test
 
 Pause The Test
     Pause Test Execution    message=Check If System Is Running!
+
+Pause The Test With Command
+    Pause Test Execution    message=Check If System Is Running!    command=log Hello
+
+Pause The Test With Command That Opens A Dialog
+    @{args}    Create List    2
+    Pause Test Execution
+    ...    message=Check If System Is Running!
+    ...    command=Count Down
+    ...    command_args=${args}
+
+Pause The Test With Command That Fails
+    TRY
+        Pause Test Execution    message=Click Run, then Continue    command=Not Exist Keyword
+    EXCEPT    AS    ${error}
+        Log    Caught expected failure: ${error}
+    END
